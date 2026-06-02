@@ -21,15 +21,4 @@ export class StudentsCacheService {
     await this.cacheRepository.setList(students);
     return { data: students, meta: { source: 'cache_miss' } };
   }
-
-  async view(identifier: string): Promise<CachedResponse<Student>> {
-    const cached = await this.cacheRepository.get(identifier);
-    if (cached) return { data: cached, meta: { source: 'cache_hit' } };
-
-    const student = await this.readRepository.findById(identifier);
-    if (!student) throw new NotFoundException('Student not found');
-
-    await this.cacheRepository.set(student);
-    return { data: student, meta: { source: 'cache_miss' } };
-  }
 }

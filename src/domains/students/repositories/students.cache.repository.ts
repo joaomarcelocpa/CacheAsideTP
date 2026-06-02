@@ -11,10 +11,6 @@ const LIST_KEY = 'students:list';
 export class StudentsCacheRepository {
   constructor(@Inject(REDIS_CLIENT) private readonly redis: Redis) {}
 
-  async get(identifier: string): Promise<Student | null> {
-    return this.redis.get<Student>(studentKey(identifier));
-  }
-
   async set(student: Student): Promise<void> {
     await this.redis.set(studentKey(student.identifier), student, {
       ex: STUDENT_TTL,
