@@ -12,5 +12,6 @@ export const dbConfig: TypeOrmModuleAsyncOptions = {
     password: config.get<string>('DB_PASSWORD'),
     autoLoadEntities: true,
     synchronize: true,
+    ssl: { rejectUnauthorized: false },
   }),
 };
