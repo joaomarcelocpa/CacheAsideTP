@@ -4,12 +4,14 @@ import {
   Delete,
   HttpCode,
   Param,
+  Patch,
   Post,
   Put,
 } from '@nestjs/common';
 import { StudentsWriteService } from '../services/students.write.service';
 import { StudentCreateDto } from '../dtos/student.create.dto';
 import { StudentUpdateDto } from '../dtos/student.update.dto';
+import { StudentUpdatePasswordDto } from '../dtos/student.update-password.dto';
 
 @Controller('students')
 export class StudentsWriteController {
@@ -26,6 +28,15 @@ export class StudentsWriteController {
     @Body() dto: StudentUpdateDto,
   ) {
     return this.studentsWriteService.update(identifier, dto);
+  }
+
+  @Patch(':identifier/password')
+  @HttpCode(204)
+  async updatePassword(
+    @Param('identifier') identifier: string,
+    @Body() dto: StudentUpdatePasswordDto,
+  ) {
+    return this.studentsWriteService.updatePassword(identifier, dto);
   }
 
   @Delete(':identifier')

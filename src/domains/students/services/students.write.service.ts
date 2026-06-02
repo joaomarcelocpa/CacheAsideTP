@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { createId } from '@paralleldrive/cuid2';
 import * as bcrypt from 'bcrypt';
@@ -10,6 +11,7 @@ import { StudentsReadRepository } from '../repositories/students.read.repository
 import { StudentsCacheRepository } from '../repositories/students.cache.repository';
 import { StudentCreateDto } from '../dtos/student.create.dto';
 import { StudentUpdateDto } from '../dtos/student.update.dto';
+import { StudentUpdatePasswordDto } from '../dtos/student.update-password.dto';
 import { Student } from '../entities/student.entity';
 
 @Injectable()
@@ -71,6 +73,31 @@ export class StudentsWriteService {
     ]);
 
     return updated;
+  }
+
+  async updatePassword(
+    identifier: string,
+    dto: StudentUpdatePasswordDto,
+  ): Promise<void> {
+    const existing = await this.readRepository.findById(identifier);
+    if (!existing) throw new NotFoundException('Student not found');
+
+    const passwordMatch = await bcrypt.compare(
+      dto.currentPassword,
+      existing.password,
+    );
+    if (!passwordMatch)
+      throw new UnauthorizedException('Invalid current password');
+
+    const passwordHash = await bcrypt.hash(dto.newPassword, 10);
+    const updated = await this.writeRepository.update(identifier, {
+      password: passwordHash,
+    });
+
+    await Promise.all([
+      this.cacheRepository.set(updated),
+      this.cacheRepository.invalidateList(),
+    ]);
   }
 
   async delete(identifier: string): Promise<void> {
