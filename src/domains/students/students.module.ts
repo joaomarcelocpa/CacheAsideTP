@@ -24,8 +24,8 @@ import { StudentsCacheController } from './controllers/students.cache.controller
   ],
   controllers: [
     StudentsWriteController,
-    StudentsReadController,
     StudentsCacheController,
+    StudentsReadController,
   ],
 })
 export class StudentsModule {}
